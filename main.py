@@ -1,8 +1,6 @@
 print("Hello Mars")
 
-
 def read_log(filename):
-    """Read and print the contents of a log file."""
     try:
         with open(filename, 'r', encoding='utf-8') as file:
             contents = file.read()
@@ -19,11 +17,9 @@ def read_log(filename):
     finally:
         print("Log reading process complete.")
 
-
 def main():
     log_filename = 'mission_computer_main.log'
     read_log(log_filename)
-
 
 if __name__ == '__main__':
     main()
