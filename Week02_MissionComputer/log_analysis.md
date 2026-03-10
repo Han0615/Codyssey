@@ -1,7 +1,7 @@
 # 미션 컴퓨터 로그 분석 보고서
 
 - **작성자:** 한송희 박사
-- **작성일:** 2023-09-11
+- **작성일:** 2023-08-27
 - **대상 파일:** mission_computer_main.log
 
 ---
@@ -18,11 +18,10 @@
 
 - 문법이 간결하여 긴급 상황에서도 빠르게 개발할 수 있다.
 - 파일 입출력과 예외 처리가 기본 내장되어 있어 외부 라이브러리 없이 로그 처리가 가능하다.
-- 과제 제약 조건(기본 라이브러리만 사용)을 충족한다.
 
 ### 2.2 개발 도구 선정 — VS Code
 
-마이크로소프트의 무료 코드 편집기인 **VS Code**를 선택하였다. 가볍고 빠르며 Python 확장 플러그인을 통해 코드 자동완성, 디버깅, 실행 환경을 모두 지원한다. PyCharm 대비 설치가 간편하고 빠르게 사용할 수 있어 긴급한 상황에 적합하며, Jupyter Notebook보다 스크립트 파일 관리에 적합하다.
+마이크로소프트의 무료 코드 편집기인 VS Code를 선택하였다. 가볍고 빠르며 Python 확장 플러그인을 통해 코드 자동완성, 디버깅, 실행 환경을 모두 지원한다.
 
 ---
 
@@ -92,15 +91,38 @@ timestamp, event, message
 | 2023-08-27 10:25:00 | INFO | Engine ignition sequence started. |
 | 2023-08-27 10:27:00 | INFO | Engines at maximum thrust. Liftoff imminent. |
 | 2023-08-27 10:30:00 | INFO | Liftoff! Rocket has left the launchpad. |
+| 2023-08-27 10:32:00 | INFO | Initial telemetry received. Rocket is on its trajectory. |
+| 2023-08-27 10:35:00 | INFO | Approaching max-Q. Aerodynamic pressure increasing. |
+| 2023-08-27 10:37:00 | INFO | Max-Q passed. Vehicle is stable. |
+| 2023-08-27 10:40:00 | INFO | First stage engines throttled down as planned. |
+| 2023-08-27 10:42:00 | INFO | Main engine cutoff confirmed. Stage separation initiated. |
+| 2023-08-27 10:45:00 | INFO | Second stage ignition. Rocket continues its ascent. |
+| 2023-08-27 10:48:00 | INFO | Payload fairing jettisoned. Satellite now exposed. |
+| 2023-08-27 10:50:00 | INFO | Orbital insertion calculations initiated. |
+| 2023-08-27 10:52:00 | INFO | Navigation systems show nominal performance. |
+| 2023-08-27 10:55:00 | INFO | Second stage burn nominal. Rocket velocity increasing. |
+| 2023-08-27 10:57:00 | INFO | Entering planned orbit around Earth. |
+| 2023-08-27 11:00:00 | INFO | Orbital operations initiated. Satellite deployment upcoming. |
+| 2023-08-27 11:05:00 | INFO | Satellite deployment successful. Mission objectives achieved. |
+| 2023-08-27 11:10:00 | INFO | Initiating deorbit maneuvers for rocket's reentry. |
+| 2023-08-27 11:15:00 | INFO | Reentry sequence started. Atmospheric drag noticeable. |
+| 2023-08-27 11:20:00 | INFO | Heat shield performing as expected during reentry. |
+| 2023-08-27 11:25:00 | INFO | Main parachutes deployed. Rocket descent rate reducing. |
+| 2023-08-27 11:28:00 | INFO | Touchdown confirmed. Rocket safely landed. |
+| 2023-08-27 11:30:00 | INFO | Mission completed successfully. Recovery team dispatched. |
+| 2023-08-27 11:35:00 | INFO | Oxygen tank unstable. |
+| 2023-08-27 11:40:00 | INFO | Oxygen tank explosion. |
+| 2023-08-27 12:00:00 | INFO | Center and mission control systems powered down. |
 
 ### 4.3 단계별 미션 진행 현황
 
 로그를 시간 순서에 따라 분석하면 다음과 같이 미션이 진행되었음을 알 수 있다.
 
-1. **시스템 초기화 (10:00 ~ 10:20):** 전력, 통신, 추진, 생명 유지 장치 등 모든 시스템이 정상적으로 초기화됨.
-2. **발사 준비 (10:20 ~ 10:27):** 최종 점검 완료 후 카운트다운 및 엔진 점화 시퀀스 시작.
-3. **발사 (10:30):** 로켓이 발사대를 이탈하며 정상 이륙.
-4. **로그 종료:** 발사 이후의 기록이 존재하지 않음.
+1. **시스템 초기화 및 발사 준비 (10:00 ~ 10:27):** 전력, 통신, 추진, 생명 유지 장치 등 모든 시스템이 정상적으로 초기화되고 최종 점검 완료.
+2. **발사 및 상승 (10:30 ~ 10:45):** 정상 이륙 후 Max-Q 통과, 1단 분리 및 2단 점화까지 모든 과정 정상 수행.
+3. **궤도 진입 및 임무 수행 (10:48 ~ 11:05):** 지구 궤도 진입 후 위성 분리 성공, 임무 목표 달성.
+4. **귀환 및 착륙 (11:10 ~ 11:30):** 역추진 기동 후 대기권 재진입, 낙하산 전개 및 안전 착륙 완료. 임무 성공적으로 종료.
+5. **사고 발생 (11:35 ~ 12:00):** 임무 완료 후 산소 탱크 불안정 감지, 5분 뒤 폭발 발생. 이후 모든 시스템 종료.
 
 ---
 
@@ -108,23 +130,18 @@ timestamp, event, message
 
 ### 5.1 로그 기반 분석
 
-로그 파일에 기록된 모든 이벤트는 `INFO` 레벨이며, 발사 시점(10:30)을 끝으로 기록이 중단된다. 발사 이후의 비행, 화성 접근, 착륙 과정에 대한 로그가 전혀 존재하지 않는다.
+로그 파일의 모든 이벤트는 `INFO` 레벨로 기록되어 있다. 임무 완료(11:30) 직후인 11:35에 산소 탱크 불안정(`Oxygen tank unstable`) 이 감지되었고, 불과 5분 후인 11:40에 산소 탱크 폭발(`Oxygen tank explosion`)이 발생하였다. 이후 12:00에 모든 시스템이 종료되었다.
 
-이는 다음 두 가지 가능성을 시사한다.
-
-1. **로그 저장 시스템의 손상:** 사고 발생 시 충격으로 인해 로그 저장 드라이브가 손상되어 발사 이후 데이터가 소실되었을 가능성.
-2. **시스템 두절:** 발사 이후 미션 컴퓨터와의 연결이 끊어져 로그가 기록되지 않았을 가능성.
+주목할 점은 폭발 발생 전 사전 경고가 단 한 건(11:35)에 불과하고, 불안정 감지부터 폭발까지의 시간이 5분으로 매우 짧아 대응이 불가능했다는 것이다.
 
 ### 5.2 결론
 
-로그 파일만으로는 **사고의 직접적인 원인을 특정하기 어렵다.** 로그는 발사까지 모든 시스템이 정상이었음을 보여주며, 발사 이후 기록이 존재하지 않기 때문에 화성 착륙 과정에서 발생한 폭발의 원인을 이 로그만으로 규명하는 것은 불가능하다.
+로그 분석 결과 **사고의 직접적인 원인은 산소 탱크 폭발**로 확인된다. 발사부터 착륙까지 모든 미션 과정은 정상적으로 수행되었으나, 임무 완료 직후 산소 탱크에서 불안정 징후가 감지되었고 이것이 폭발로 이어져 화성 기지 전체 시스템이 종료되었다.
 
 추가 조사가 필요한 항목은 다음과 같다.
 
-- 별도 드라이브에 저장된 다른 데이터 파일 분석
-- 발사 이후 구간의 로그 데이터 복구 시도
+- 산소 탱크 불안정의 근본 원인 파악 (제조 결함, 충격 손상, 압력 이상 등)
+- 발사 전 산소 탱크 점검 기록 재검토
 - 하드웨어 물리적 손상 부위 육안 점검
 
 ---
-
-*본 보고서는 화성 기지 사고 원인 규명을 위해 작성된 1차 분석 보고서입니다.*
