@@ -1,12 +1,16 @@
 import csv
+import os
 from datetime import datetime
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 print('Hello Mars')
 
 def parse_log(filename):
+    filepath = os.path.join(BASE_DIR, filename)
     log_entries = []
     try:
-        with open(filename, 'r', encoding='utf-8') as file:
+        with open(filepath, 'r', encoding='utf-8') as file:
             reader = csv.DictReader(file)
             for row in reader:
                 log_entries.append(row)
