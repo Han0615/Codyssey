@@ -113,7 +113,6 @@ def print_analysis(log_entries):
     else:
         print('\n[분석 3] 비정상 시간 간격 감지: 해당 없음')
 
-    # 종합 결론
     print('\n=== 종합 분석 결과 ===')
     if anomalies:
         print(f'총 {len(anomalies)}건의 이상 징후가 감지되었습니다.')
