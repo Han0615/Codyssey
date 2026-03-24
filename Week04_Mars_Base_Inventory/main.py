@@ -1,115 +1,64 @@
 import csv
 import os
+import pickle
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# 1. CSV 파일 읽기
+inventory = []
 
-def read_inventory(filename):
-    filepath = os.path.join(BASE_DIR, filename)
-    inventory = []
-    try:
-        with open(filepath, 'r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                inventory.append(row)
-    except FileNotFoundError:
-        print(f'[오류] 파일을 찾을 수 없습니다: {filepath}')
-    except PermissionError:
-        print(f'[오류] 파일 읽기 권한이 없습니다: {filepath}')
-    except UnicodeDecodeError:
-        print(f'[오류] 파일 인코딩 오류가 발생했습니다: {filepath}')
-    except OSError as e:
-        print(f'[오류] OS 오류가 발생했습니다: {e}')
-    else:
-        return inventory
-    finally:
-        print('파일 읽기 프로세스가 완료되었습니다.\n')
-    return []
+try:
+    with open(os.path.join(BASE_DIR, 'Mars_Base_Inventory_List.csv'), 'r', encoding='utf-8') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            inventory.append(dict(row))
+except FileNotFoundError:
+    print('[오류] 파일을 찾을 수 없습니다.')
+except OSError as e:
+    print(f'[오류] 파일을 읽을 수 없습니다: {e}')
 
+# 2. 전체 목록 출력
+print('=== 전체 화물 목록 ===')
+for item in inventory:
+    print(item)
 
-def print_inventory(inventory):
-    print('=== 전체 화물 목록 ===')
-    for item in inventory:
-        print(
-            f"물질: {item['Substance']:<25} "
-            f"무게: {item['Weight (g/cm³)']:<10} "
-            f"비중: {item['Specific Gravity']:<10} "
-            f"강도: {item['Strength']:<12} "
-            f"인화성: {item['Flammability']}"
-        )
-    print()
+# 3. 인화성 높은 순 정렬
+sorted_inventory = sorted(inventory, key=lambda x: float(x['Flammability']), reverse=True)
 
+print('\n=== 인화성 높은 순으로 정렬된 목록 ===')
+for item in sorted_inventory:
+    print(item)
 
-def sort_by_flammability(inventory):
-    return sorted(
-        inventory,
-        key=lambda x: float(x['Flammability']),
-        reverse=True
-    )
+# 4. 인화성 0.7 이상 필터링 및 출력, CSV 저장
+dangerous = [item for item in sorted_inventory if float(item['Flammability']) >= 0.7]
 
+print('\n=== 인화성 지수 0.7 이상 위험 물질 ===')
+for item in dangerous:
+    print(item)
 
-def filter_dangerous(inventory):
-    return [
-        item for item in inventory
-        if float(item['Flammability']) >= 0.7
-    ]
+try:
+    with open(os.path.join(BASE_DIR, 'Mars_Base_Inventory_danger.csv'), 'w', encoding='utf-8', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=dangerous[0].keys())
+        writer.writeheader()
+        writer.writerows(dangerous)
+except OSError as e:
+    print(f'[오류] CSV 파일을 저장할 수 없습니다: {e}')
 
+# 5. 정렬된 목록 바이너리 파일 저장
+try:
+    with open(os.path.join(BASE_DIR, 'Mars_Base_Inventory_List.bin'), 'wb') as file:
+        pickle.dump(sorted_inventory, file)
+except OSError as e:
+    print(f'[오류] 바이너리 파일을 저장할 수 없습니다: {e}')
 
-def print_dangerous(dangerous_items):
-    print('=== 위험 물질 목록 (인화성 지수 0.7 이상) ===')
-    for item in dangerous_items:
-        print(
-            f"물질: {item['Substance']:<25} "
-            f"인화성: {item['Flammability']}"
-        )
-    print()
+# 6. 바이너리 파일 그대로 읽어서 출력
+bin_data = b''
 
+try:
+    with open(os.path.join(BASE_DIR, 'Mars_Base_Inventory_List.bin'), 'rb') as file:
+        bin_data = file.read()
+except OSError as e:
+    print(f'[오류] 바이너리 파일을 읽을 수 없습니다: {e}')
 
-def save_dangerous(dangerous_items, filename):
-    filepath = os.path.join(BASE_DIR, filename)
-    try:
-        with open(filepath, 'w', encoding='utf-8', newline='') as file:
-            fieldnames = [
-                'Substance', 'Weight (g/cm³)',
-                'Specific Gravity', 'Strength', 'Flammability'
-            ]
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(dangerous_items)
-    except PermissionError:
-        print(f'[오류] 파일 쓰기 권한이 없습니다: {filepath}')
-    except OSError as e:
-        print(f'[오류] OS 오류가 발생했습니다: {e}')
-    else:
-        print(f'위험 물질 목록이 저장되었습니다: {filepath}\n')
-    finally:
-        print('파일 저장 프로세스가 완료되었습니다.\n')
-
-
-def main():
-    input_filename = 'Mars_Base_Inventory_List.csv'
-    output_filename = 'Mars_Base_Inventory_danger.csv'
-
-    inventory = read_inventory(input_filename)
-    if not inventory:
-        return
-    
-    print_inventory(inventory)
-
-    sorted_inventory = sort_by_flammability(inventory)
-    print('=== 인화성 높은 순으로 정렬된 목록 ===')
-    for item in sorted_inventory:
-        print(
-            f"물질: {item['Substance']:<25} "
-            f"인화성: {item['Flammability']}"
-        )
-    print()
-
-    dangerous_items = filter_dangerous(sorted_inventory)
-    print_dangerous(dangerous_items)
-
-    save_dangerous(dangerous_items, output_filename)
-
-
-if __name__ == '__main__':
-    main()
+print('\n=== 바이너리 파일에서 읽은 목록 ===')
+print(bin_data)
