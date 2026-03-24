@@ -1,7 +1,7 @@
 # 화성 기지 화물 인화성 분석 보고서
 
 - **작성자:** 한송희 박사
-- **작성일:** 2023-08-28
+- **작성일:** 2026-03-24
 - **대상 파일:** Mars_Base_Inventory_List.csv
 - **출력 파일:** Mars_Base_Inventory_danger.csv, Mars_Base_Inventory_List.bin
 
