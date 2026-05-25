@@ -1,0 +1,104 @@
+import os
+import wave
+from datetime import datetime
+
+# 음성 녹음을 위한 외부 라이브러리 (허용됨)
+import pyaudio 
+# pip install pyaudio
+
+class JavisRecorder:
+    def __init__(self):
+        self.record_dir = 'records'
+        self._initialize_directory()
+
+    def _initialize_directory(self):
+        if not os.path.exists(self.record_dir):
+            os.makedirs(self.record_dir)
+
+    def record_voice(self, record_seconds=5):
+        chunk = 1024
+        audio_format = pyaudio.paInt16
+        channels = 1
+        rate = 44100
+
+        audio = pyaudio.PyAudio()
+
+        print(f'\n[녹음 시작] {record_seconds}초 동안 음성을 기록합니다...')
+        
+        try:
+            # 마이크 스트림 열기
+            stream = audio.open(
+                format=audio_format,
+                channels=channels,
+                rate=rate,
+                input=True,
+                frames_per_buffer=chunk
+            )
+
+            frames = []
+            
+            # 지정된 시간 동안 오디오 데이터를 청크 단위로 읽어오기
+            for _ in range(0, int(rate / chunk * record_seconds)):
+                data = stream.read(chunk)
+                frames.append(data)
+
+            print('[녹음 종료] 음성 데이터 수집을 완료했습니다.')
+
+            stream.stop_stream()
+            stream.close()
+
+        except Exception as e:
+            print(f'[시스템 오류] 마이크 인식 또는 녹음 중 문제가 발생했습니다: {e}')
+            audio.terminate()
+            return
+
+        audio.terminate()
+
+        now = datetime.now()
+        file_name = now.strftime('%Y%m%d-%H%M%S') + '.wav'
+        file_path = os.path.join(self.record_dir, file_name)
+        
+        try:
+            with wave.open(file_path, 'wb') as wf:
+                wf.setnchannels(channels)
+                wf.setsampwidth(audio.get_sample_size(audio_format))
+                wf.setframerate(rate)
+                wf.writeframes(b''.join(frames))
+            print(f'[저장 성공] 기록이 안전하게 보관되었습니다: {file_path}')
+        except OSError as e:
+            print(f'[시스템 오류] 파일을 디스크에 저장할 수 없습니다: {e}')
+
+    def search_records_by_date(self, start_date, end_date):
+        print(f'\n--- [기록 조회] 기간: {start_date} ~ {end_date} ---')
+        
+        try:
+            files = os.listdir(self.record_dir)
+            found_files = []
+
+            for file in files:
+                if file.endswith('.wav'):
+                    # 파일명에서 앞부분의 날짜(YYYYMMDD)만 추출
+                    file_date = file.split('-')[0]
+                    
+                    # 문자열 크기 비교를 통해 기간 내에 있는지 확인
+                    if start_date <= file_date <= end_date:
+                        found_files.append(file)
+
+            if found_files:
+                print(f'총 {len(found_files)}개의 기록이 발견되었습니다.')
+                for f in sorted(found_files):
+                    print(f' - {f}')
+            else:
+                print('해당 기간에 기록된 일지가 없습니다.')
+                
+        except FileNotFoundError:
+            print('[오류] records 폴더를 찾을 수 없습니다. 아직 녹음된 파일이 없습니다.')
+
+
+if __name__ == '__main__':
+    
+    javis = JavisRecorder()
+    
+    javis.record_voice(record_seconds=5)
+    
+    javis.search_records_by_date(start_date='20260501', end_date='20260531')
