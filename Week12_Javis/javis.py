@@ -2,10 +2,8 @@ import os
 import wave
 from datetime import datetime
 
-# 음성 녹음을 위한 외부 라이브러리 (허용됨)
 import pyaudio 
 # pip install pyaudio
-
 class JavisRecorder:
     def __init__(self):
         self.record_dir = 'records'
@@ -26,7 +24,6 @@ class JavisRecorder:
         print(f'\n[녹음 시작] {record_seconds}초 동안 음성을 기록합니다...')
         
         try:
-            # 마이크 스트림 열기
             stream = audio.open(
                 format=audio_format,
                 channels=channels,
@@ -37,7 +34,6 @@ class JavisRecorder:
 
             frames = []
             
-            # 지정된 시간 동안 오디오 데이터를 청크 단위로 읽어오기
             for _ in range(0, int(rate / chunk * record_seconds)):
                 data = stream.read(chunk)
                 frames.append(data)
@@ -77,10 +73,8 @@ class JavisRecorder:
 
             for file in files:
                 if file.endswith('.wav'):
-                    # 파일명에서 앞부분의 날짜(YYYYMMDD)만 추출
                     file_date = file.split('-')[0]
                     
-                    # 문자열 크기 비교를 통해 기간 내에 있는지 확인
                     if start_date <= file_date <= end_date:
                         found_files.append(file)
 
