@@ -13,7 +13,7 @@ class JavisRecorder:
         if not os.path.exists(self.record_dir):
             os.makedirs(self.record_dir)
 
-    def record_voice(self, record_seconds=5):
+    def record_voice(self, record_seconds=20):
         chunk = 1024
         audio_format = pyaudio.paInt16
         channels = 1
@@ -93,6 +93,6 @@ if __name__ == '__main__':
     
     javis = JavisRecorder()
     
-    javis.record_voice(record_seconds=5)
+    javis.record_voice(record_seconds=20)
     
     javis.search_records_by_date(start_date='20260501', end_date='20260531')
