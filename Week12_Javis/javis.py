@@ -13,18 +13,18 @@ class JavisRecorder:
         if not os.path.exists(self.record_dir):
             os.makedirs(self.record_dir)
 
-    def record_voice(self, record_seconds=20):
+    def record_voice(self, record_seconds=20): 
         chunk = 1024
         audio_format = pyaudio.paInt16
         channels = 1
         rate = 44100
 
-        audio = pyaudio.PyAudio()
+        audio = pyaudio.PyAudio()    # 오디오 제어 엔진 활성화
 
         print(f'\n[녹음 시작] {record_seconds}초 동안 음성을 기록합니다...')
         
         try:
-            stream = audio.open(
+            stream = audio.open(    # 마이크 스트림 개통
                 format=audio_format,
                 channels=channels,
                 rate=rate,
