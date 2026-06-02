@@ -1,6 +1,5 @@
 import csv
 import os
-import wave
 import speech_recognition as sr
 
 class JavisRecorder:
