@@ -1,7 +1,6 @@
 import csv
 import os
 import speech_recognition as sr
-
 class JavisRecorder:
     def __init__(self):
         self.record_dir = 'records'
