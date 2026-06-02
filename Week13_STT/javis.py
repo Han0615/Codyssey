@@ -11,7 +11,7 @@ class JavisRecorder:
 
     def transcribe_to_csv(self):
         recognizer = sr.Recognizer()
-        chunk_length = 5.0
+        chunk_length = 4.5
 
         wav_files = [f for f in os.listdir(self.record_dir) if f.endswith('.wav')]
 
