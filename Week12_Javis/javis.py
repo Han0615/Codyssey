@@ -64,35 +64,8 @@ class JavisRecorder:
         except OSError as e:
             print(f'[시스템 오류] 파일을 디스크에 저장할 수 없습니다: {e}')
 
-    def search_records_by_date(self, start_date, end_date):
-        print(f'\n--- [기록 조회] 기간: {start_date} ~ {end_date} ---')
-        
-        try:
-            files = os.listdir(self.record_dir)
-            found_files = []
-
-            for file in files:
-                if file.endswith('.wav'):
-                    file_date = file.split('-')[0]
-                    
-                    if start_date <= file_date <= end_date:
-                        found_files.append(file)
-
-            if found_files:
-                print(f'총 {len(found_files)}개의 기록이 발견되었습니다.')
-                for f in sorted(found_files):
-                    print(f' - {f}')
-            else:
-                print('해당 기간에 기록된 일지가 없습니다.')
-                
-        except FileNotFoundError:
-            print('[오류] records 폴더를 찾을 수 없습니다. 아직 녹음된 파일이 없습니다.')
-
-
 if __name__ == '__main__':
     
     javis = JavisRecorder()
     
     javis.record_voice(record_seconds=20)
-    
-    javis.search_records_by_date(start_date='20260501', end_date='20260531')
