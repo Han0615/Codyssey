@@ -1,6 +1,6 @@
 import csv
 import os
-import speech_recognition as sr
+import speech_recognition as sr #pip install SpeechRecognition                 
 class JavisRecorder:
     def __init__(self):
         self.record_dir = 'records'
@@ -71,11 +71,11 @@ class JavisRecorder:
         if not found:
             print("검색 결과가 없습니다.")
 
-if __name__ == '__main__':
-    javis = JavisRecorder()
-    javis.transcribe_to_csv()
 
-    while True:
+javis = JavisRecorder()
+javis.transcribe_to_csv()
+
+while True:
         word = input('\n🔍 검색어 (종료: q): ').strip()
         if word.lower() == 'q': 
             print("프로그램을 종료합니다.")
